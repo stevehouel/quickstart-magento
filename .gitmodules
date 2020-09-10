@@ -1,12 +1,12 @@
 [submodule "submodules/quickstart-aws-vpc"]
     path = submodules/quickstart-aws-vpc
     url = ../../aws-quickstart/quickstart-aws-vpc.git
-    branch = master
+    branch = main
 [submodule "submodules/quickstart-linux-bastion"]
     path = submodules/quickstart-linux-bastion
     url = ../../aws-quickstart/quickstart-linux-bastion.git
-    branch = master
+    branch = main
 [submodule "submodules/quickstart-amazon-aurora-mysql"]
     path = submodules/quickstart-amazon-aurora-mysql
     url = ../../aws-quickstart/quickstart-amazon-aurora-mysql.git
-    branch = master
+    branch = main
