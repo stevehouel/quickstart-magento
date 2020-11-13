@@ -193,7 +193,6 @@ cd /var/www/html/bin
 
 fi
 
-
-
 ./magento info:adminuri > /home/ec2-user/adminuri
 
+php /var/www/html/bin/magento setup:static-content:deploy
