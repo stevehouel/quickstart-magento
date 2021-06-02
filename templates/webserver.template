@@ -2,6 +2,11 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: Magento 2.3.2 Web Server Template (qs-1qup6racr)
 Parameters:
+  ProjectName:
+    Type: String
+  StageName:
+    Type: String
+    Default: dev
   AdminEmail:
     Description: Email of the Magento site administrator
     Type: String
