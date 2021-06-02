@@ -87,25 +87,6 @@ Resources:
         FromPort: 443
         ToPort: 443
         CidrIp: 0.0.0.0/0
-  EFSSecurityGroup:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      GroupDescription: Database Security Group (AWS Quick Start)
-      VpcId: !Ref VPCID
-      SecurityGroupIngress:
-      - IpProtocol: tcp
-        FromPort: 2049
-        ToPort: 2049
-        CidrIp: !Ref VPCCIDR
-      SecurityGroupEgress:
-      - IpProtocol: tcp
-        FromPort: 80
-        ToPort: 80
-        CidrIp: 0.0.0.0/0
-      - IpProtocol: tcp
-        FromPort: 443
-        ToPort: 443
-        CidrIp: 0.0.0.0/0
   ElastiCacheSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -133,14 +114,7 @@ Resources:
       ToPort: 3306
       DestinationSecurityGroupId: !GetAtt MySQLRDSSecurityGroup.GroupId
       GroupId: !GetAtt WebServerSecurityGroup.GroupId
-  SecurityGroupRuleAppEFS:
-    Type: AWS::EC2::SecurityGroupEgress
-    Properties:
-      IpProtocol: tcp
-      FromPort: 2049
-      ToPort: 2049
-      DestinationSecurityGroupId: !GetAtt EFSSecurityGroup.GroupId
-      GroupId: !GetAtt WebServerSecurityGroup.GroupId
+
   SecurityGroupRuleAppCache:
     Type: AWS::EC2::SecurityGroupEgress
     Properties:
@@ -159,9 +133,6 @@ Outputs:
   WebServerSecurityGroup:
     Description: Web Server Security Group
     Value: !Ref WebServerSecurityGroup
-  EFSSecurityGroup:
-    Description: EFS Security Group
-    Value: !Ref EFSSecurityGroup
   ElastiCacheSecurityGroup:
     Description: Elasticache Security Group
     Value: !Ref ElastiCacheSecurityGroup

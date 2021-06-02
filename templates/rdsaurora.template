@@ -23,28 +23,22 @@ Parameters:
     Type: String
   DBInstanceClass:
     AllowedValues:
-    - db.t1.micro
-    - db.m1.small
-    - db.m3.medium
-    - db.m3.large
-    - db.m3.xlarge
-    - db.m3.2xlarge
-    - db.m4.2xlarge
-    - db.r3.large
-    - db.r3.xlarge
-    - db.r3.2xlarge
-    - db.r3.4xlarge
-    - db.r3.8xlarge
-    - db.t2.micro
-    - db.t2.small
-    - db.t2.medium
-    - db.m2.xlarge
-    - db.m2.2xlarge
-    - db.m2.4xlarge
-    - db.cr1.8xlarge
-    - db.m1.medium
-    - db.m1.large
-    - db.m1.xlarge
+    - db.r5.24xlarge
+    - db.r5.16xlarge
+    - db.r5.12xlarge
+    - db.r5.2xlarge
+    - db.r5.4xlarge
+    - db.r5.large
+    - db.r5.xlarge
+    - db.r6g.16xlarge
+    - db.r6g.12xlarge
+    - db.r6g.2xlarge
+    - db.r6g.4xlarge
+    - db.r6g.large
+    - db.r6g.xlarge
+    - db.t3.large
+    - db.t3.medium
+    - db.t3.small
     ConstraintDescription: Must select a valid database instance type.
     Default: db.r3.2xlarge
     Description: The name of the compute and memory capacity class of the DB instance.

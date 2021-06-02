@@ -59,10 +59,6 @@ Parameters:
     Description: A list of public subnet identifiers of Amazon VPCs where the Elastic
       Load Balancer would be launched.
     Type: List<AWS::EC2::Subnet::Id>
-  KeyPair:
-    ConstraintDescription: Must be the name of an existing EC2 KeyPair.
-    Description: Name of an existing EC2 KeyPair to enable SSH access to the instances
-    Type: AWS::EC2::KeyPair::KeyName
   MagentoCurrency:
     Default: EUR
     Description: Magento Currency
@@ -92,29 +88,6 @@ Parameters:
     ConstraintDescription: Must be a valid email address.
     Description: Email address to notify if there are any scaling operations
     Type: String
-  QSS3BucketName:
-    AllowedPattern: ^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$
-    ConstraintDescription: Quick Start bucket name can include numbers, lowercase
-      letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen
-      (-).
-    Default: aws-quickstart
-    Description: S3 bucket name for the Quick Start assets. Quick Start bucket name
-      can include numbers, lowercase letters, uppercase letters, and hyphens (-).
-      It cannot start or end with a hyphen (-).
-    Type: String
-  QSS3BucketRegion:
-    Default: 'us-east-1'
-    Description: 'The AWS Region where the Quick Start S3 bucket (QSS3BucketName) is hosted. When using your own bucket, you must specify this value.'
-    Type: String
-  QSS3KeyPrefix:
-    AllowedPattern: ^[0-9a-zA-Z-/]*$
-    ConstraintDescription: Quick Start key prefix can include numbers, lowercase letters,
-      uppercase letters, hyphens (-), and forward slash (/).
-    Default: quickstart-magento/
-    Description: S3 key prefix for the Quick Start assets. Quick Start key prefix
-      can include numbers, lowercase letters, uppercase letters, hyphens (-), and
-      forward slash (/).
-    Type: String
   SSLCertificateId:
     Default: 'none'
     Description: The ARN of the SSL certificate to use for the webserver. [optional]
@@ -128,38 +101,27 @@ Parameters:
     Type: Number
   WebServerInstanceType:
     AllowedValues:
-    - t2.micro
-    - t2.small
-    - t2.medium
-    - t2.large
-    - m4.large
-    - m4.xlarge
-    - m4.2xlarge
-    - m4.4xlarge
-    - m4.10xlarge
-    - m3.medium
-    - m3.large
-    - m3.xlarge
-    - m3.2xlarge
-    - c4.large
-    - c4.xlarge
-    - c4.2xlarge
-    - c4.4xlarge
-    - c4.8xlarge
-    - c3.large
-    - c3.xlarge
-    - c3.2xlarge
-    - c3.4xlarge
-    - c3.8xlarge
-    - r3.large
-    - r3.xlarge
-    - r3.2xlarge
-    - r3.4xlarge
-    - r3.8xlarge
-    - i2.xlarge
-    - i2.2xlarge
-    - i2.4xlarge
-    - i2.8xlarge
+    - t3.micro
+    - t3.small
+    - t3.medium
+    - t3.large
+    - t3.xlarge
+    - t3.2xlarge
+    - m6g.large
+    - m6g.xlarge
+    - m6g.2xlarge
+    - m6g.4xlarge
+    - m6g.8xlarge
+    - c6g.large
+    - c6g.xlarge
+    - c6g.2xlarge
+    - c6g.4xlarge
+    - c6g.8xlarge
+    - r6g.large
+    - r6g.xlarge
+    - r6g.2xlarge
+    - r6g.4xlarge
+    - r6g.8xlarge
     ConstraintDescription: Choose an instance type.
     Default: m4.large
     Description: Web Server node instance type
@@ -193,34 +155,6 @@ Conditions:
     - ''
   UsingDefaultBucket: !Equals [!Ref QSS3BucketName, 'aws-quickstart']
 Resources:
-  FileSystem:
-    Type: AWS::EFS::FileSystem
-    Properties:
-      PerformanceMode: generalPurpose
-      Encrypted: true
-      FileSystemTags:
-      - Key: Name
-        Value: EFS AWS Quick Start
-  MountTarget1:
-    Type: AWS::EFS::MountTarget
-    Properties:
-      FileSystemId: !Ref FileSystem
-      SubnetId:
-        !Select
-        - '0'
-        - !Ref WebServerSubnets
-      SecurityGroups:
-      - !Ref EFSSecurityGroup
-  MountTarget2:
-    Type: AWS::EFS::MountTarget
-    Properties:
-      FileSystemId: !Ref FileSystem
-      SubnetId:
-        !Select
-        - '1'
-        - !Ref WebServerSubnets
-      SecurityGroups:
-      - !Ref EFSSecurityGroup
   MagentoMainLogGroup:
     Type: AWS::Logs::LogGroup
   NewIamInstanceRole:
