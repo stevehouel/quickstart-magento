@@ -1,0 +1,166 @@
+[
+    {
+      "ParameterKey": "ProjectName",
+      "ParameterValue": "magento-sample"
+    },
+    {
+        "ParameterKey": "StageName",
+        "ParameterValue": "dev"
+    },
+    {
+        "ParameterKey": "AccessCIDR",
+        "ParameterValue": "sample@magento.fr"
+    },
+    {
+        "ParameterKey": "AdminEmail",
+        "ParameterValue": "magento-sample"
+    },
+    {
+        "ParameterKey": "AdminFirstName",
+        "ParameterValue": "magento-sample"
+    },
+    {
+        "ParameterKey": "AdminLastName",
+        "ParameterValue": "magento-sample"
+    },
+    {
+        "ParameterKey": "AdminPassword",
+        "ParameterValue": "magento-sample"
+    },
+    {
+        "ParameterKey": "AdminUserName",
+        "ParameterValue": "magento-sample"
+    },
+    {
+        "ParameterKey": "AvailabilityZones",
+        "ParameterValue": "magento-sample"
+    },
+    {
+        "ParameterKey": "DBAutoMinorVersionUpgrade",
+        "ParameterValue": "magento-sample"
+    },
+    {
+        "ParameterKey": "DBBackupRetentionPeriod",
+        "ParameterValue": "magento-sample"
+    },
+    {
+        "ParameterKey": "DBEngineType",
+        "ParameterValue": "magento-sample"
+    },
+    {
+        "ParameterKey": "DBInstanceClass",
+        "ParameterValue": "magento-sample"
+    },
+    {
+        "ParameterKey": "DBMasterUserPassword",
+        "ParameterValue": "magento-sample"
+    },
+    {
+        "ParameterKey": "DBMasterUsername",
+        "ParameterValue": "magento-sample"
+    },
+    {
+        "ParameterKey": "DBMultiAZ",
+        "ParameterValue": "magento-sample"
+    },
+    {
+        "ParameterKey": "DBName",
+        "ParameterValue": "magento-sample"
+    },
+    {
+        "ParameterKey": "DNSName",
+        "ParameterValue": "magento-sample"
+    },
+    {
+        "ParameterKey": "ElastiCacheAutomaticFailover",
+        "ParameterValue": "magento-sample"
+    },
+    {
+        "ParameterKey": "ElastiCacheNodeType",
+        "ParameterValue": "magento-sample"
+    },
+    {
+        "ParameterKey": "ElastiCacheNodes",
+        "ParameterValue": "magento-sample"
+    },
+    {
+        "ParameterKey": "MagentoCurrency",
+        "ParameterValue": "magento-sample"
+    },
+    {
+        "ParameterKey": "MagentoLanguage",
+        "ParameterValue": "magento-sample"
+    },
+    {
+        "ParameterKey": "MagentoReleaseMedia",
+        "ParameterValue": "magento-sample"
+    },
+    {
+        "ParameterKey": "MagentoVersion",
+        "ParameterValue": "magento-sample"
+    },
+    {
+        "ParameterKey": "MagentoTimezone",
+        "ParameterValue": "magento-sample"
+    },
+    {
+        "ParameterKey": "NotificationEmail",
+        "ParameterValue": "magento-sample"
+    },
+    {
+        "ParameterKey": "PrivateSubnet1CIDR",
+        "ParameterValue": "magento-sample"
+    },
+    {
+        "ParameterKey": "PrivateSubnet2CIDR",
+        "ParameterValue": "magento-sample"
+    },
+    {
+        "ParameterKey": "PublicSubnet1CIDR",
+        "ParameterValue": "magento-sample"
+    },
+    {
+        "ParameterKey": "PublicSubnet2CIDR",
+        "ParameterValue": "magento-sample"
+    },
+    {
+        "ParameterKey": "QSS3BucketName",
+        "ParameterValue": "magento-sample"
+    },
+    {
+        "ParameterKey": "QSS3BucketRegion",
+        "ParameterValue": "magento-sample"
+    },
+    {
+        "ParameterKey": "QSS3KeyPrefix",
+        "ParameterValue": "magento-sample"
+    },
+    {
+        "ParameterKey": "RemoteAccessCIDR",
+        "ParameterValue": "magento-sample"
+    },
+    {
+        "ParameterKey": "SSLCertificateId",
+        "ParameterValue": "magento-sample"
+    },
+    {
+        "ParameterKey": "VPCCIDR",
+        "ParameterValue": "magento-sample"
+    },
+    {
+        "ParameterKey": "WebServerDesiredCapacity",
+        "ParameterValue": "magento-sample"
+    },
+    {
+        "ParameterKey": "WebServerInstanceType",
+        "ParameterValue": "magento-sample"
+    },
+    {
+        "ParameterKey": "WebServerMaxSize",
+        "ParameterValue": "magento-sample"
+    },
+    {
+        "ParameterKey": "WebServerMinSize",
+        "ParameterValue": "magento-sample"
+    }
+  ]
