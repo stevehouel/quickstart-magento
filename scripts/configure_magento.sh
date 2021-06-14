@@ -167,16 +167,12 @@ $init_value
 ;
 EOF
 
-mysql -h $dbhost -u $dbuser $dbname -p$dbpassword << EOF
-INSERT INTO core_config_data (scope, scope_id, path, value) VALUES ('default', 0, 'dev/static/sign', 1)
-EOF
+./magento config:set dev/static/sign 1
 
 if [ "$protocol" = "http" ]
 then
 
-mysql -h $dbhost -u $dbuser $dbname -p$dbpassword << EOF
-INSERT INTO core_config_data (scope, scope_id, path, value) VALUES ('default', 0, 'web/url/redirect_to_base', 0)
-EOF
+./magento config:set web/url/redirect_to_base 0
 
 fi
 
