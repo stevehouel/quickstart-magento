@@ -29,17 +29,17 @@ create-stack:
 
 create-change-set:
 	aws cloudformation create-change-set \
-		--template-body file://template-out.yml \
+		--template-body file://templates/magento-master.template.yaml \
 		--stack-name ${PROJECT_NAME}-${STAGE_NAME} \
 		--parameter file://config/config.${STAGE_NAME}.json \
-		--change-set-name ${PROJECT_NAME}-${STAGE_NAME}-changeset
+		--change-set-name ${PROJECT_NAME}-${STAGE_NAME}-changeset \
 		--capabilities CAPABILITY_NAMED_IAM \
 		--region $(AWS_REGION) \
 		--tags $(TAGS_PARAMS)
 
 execute-change-set:
 	aws cloudformation execute-change-set \
-		--change-set-name ${PROJECT_NAME}-${STAGE_NAME}-changeset
+		--change-set-name ${PROJECT_NAME}-${STAGE_NAME}-changeset \
 		--stack-name ${PROJECT_NAME}-${STAGE_NAME}
 
 delete-stack:
