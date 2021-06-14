@@ -3,20 +3,11 @@ AWSTemplateFormatVersion: '2010-09-09'
 Description: "AWS Aurora MySql, Do Not Remove Apache License Version 2.0 (qs-1r51947et) Jun,15,2019"
 
 Parameters:
-  ProjectName:
-    Type: String
-  StageName:
-    Type: String
-    Default: dev
   QSS3BucketName:
     AllowedPattern: "^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$"
     ConstraintDescription: "Quick Start bucket name can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-)."
     Default: aws-quickstart
     Description: "S3 bucket name for the Quick Start assets. Quick Start bucket name can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-)."
-    Type: String
-  QSS3BucketRegion:
-    Default: 'us-east-1'
-    Description: 'The AWS Region where the Quick Start S3 bucket (QSS3BucketName) is hosted. When using your own bucket, you must specify this value.'
     Type: String
   QSS3KeyPrefix:
     AllowedPattern: "^[0-9a-zA-Z-/]*$"
@@ -109,25 +100,8 @@ Parameters:
       - 'global'
       - 'multimaster'
   DBInstanceClass:
-    AllowedValues:
-      - db.r5.24xlarge
-      - db.r5.16xlarge
-      - db.r5.12xlarge
-      - db.r5.2xlarge
-      - db.r5.4xlarge
-      - db.r5.large
-      - db.r5.xlarge
-      - db.r6g.16xlarge
-      - db.r6g.12xlarge
-      - db.r6g.2xlarge
-      - db.r6g.4xlarge
-      - db.r6g.large
-      - db.r6g.xlarge
-      - db.t3.large
-      - db.t3.medium
-      - db.t3.small
     ConstraintDescription: "Must select a valid database instance type."
-    Default: db.r4.large
+    Default: db.r5.large
     Description: "The name of the compute and memory capacity class of the database instance. Not Applicable for Aurora Serverless. Supported instance types for Aurora Multi-Master is db.r4.[2/4/8]xlarge only currently."
     Type: String
   DBAccessCIDR:
@@ -475,7 +449,6 @@ Rules:
         AssertDescription: "Please provide 2 distinct private subnets"
 
 Conditions:
-  UsingDefaultBucket: !Equals [!Ref QSS3BucketName, 'aws-quickstart']
   DBPasswordRotation:
     !Equals
     - !Ref RotateDBPassword
@@ -985,7 +958,6 @@ Resources:
         AutomaticallyAfterDays: 89
   RDSRotationLambda:
     Condition: DBPasswordRotation
-    DependsOn: CopyZips
     Type: AWS::Lambda::Function
     Properties:
       Runtime: python3.7
@@ -1005,24 +977,9 @@ Resources:
           - !Ref Subnet1ID
           - !Ref Subnet2ID
       Code:
-        S3Bucket: !Ref 'LambdaZipsBucket'
-        S3Key: !Sub '${QSS3KeyPrefix}functions/packages/SSMRotateLambda/lambda.zip'
+        S3Bucket: !Ref QSS3BucketName
+        S3Key: !Sub '${QSS3KeyPrefix}code/SSMRotateLambda/lambda.zip'
       Timeout: 300
-  LambdaZipsBucket:
-    Condition: DBPasswordRotation
-    Type: AWS::S3::Bucket
-    Properties:
-      Tags: []
-  CopyZips:
-    Condition: DBPasswordRotation
-    Type: Custom::CopyZips
-    Properties:
-      ServiceToken: !GetAtt 'CopyZipsFunction.Arn'
-      DestBucket: !Ref 'LambdaZipsBucket'
-      SourceBucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
-      Prefix: !Ref 'QSS3KeyPrefix'
-      Objects:
-        - functions/packages/SSMRotateLambda/lambda.zip
   LambdaExecutionRole:
     Condition: DBPasswordRotation
     Type: AWS::IAM::Role
@@ -1078,106 +1035,6 @@ Resources:
       FunctionName: !GetAtt RDSRotationLambda.Arn
       Action: 'lambda:InvokeFunction'
       Principal: secretsmanager.amazonaws.com
-  CopyZipsFunction:
-    Condition: DBPasswordRotation
-    Type: AWS::Lambda::Function
-    Properties:
-      Description: Copies objects from a source S3 bucket to a destination
-      Handler: index.handler
-      Runtime: python3.7
-      Role: !GetAtt 'CopyZipsRole.Arn'
-      Timeout: 240
-      Code:
-        ZipFile: |
-          import json
-          import logging
-          import threading
-          import boto3
-          import cfnresponse
-
-
-          def copy_objects(source_bucket, dest_bucket, prefix, objects):
-              s3 = boto3.client('s3')
-              for o in objects:
-                  key = prefix + o
-                  copy_source = {
-                      'Bucket': source_bucket,
-                      'Key': key
-                  }
-                  print('copy_source: %s' % copy_source)
-                  print('dest_bucket = %s'%dest_bucket)
-                  print('key = %s' %key)
-                  s3.copy_object(CopySource=copy_source, Bucket=dest_bucket,
-                        Key=key)
-
-
-          def delete_objects(bucket, prefix, objects):
-              s3 = boto3.client('s3')
-              objects = {'Objects': [{'Key': prefix + o} for o in objects]}
-              s3.delete_objects(Bucket=bucket, Delete=objects)
-
-
-          def timeout(event, context):
-              logging.error('Execution is about to time out, sending failure response to CloudFormation')
-              cfnresponse.send(event, context, cfnresponse.FAILED, {}, None)
-
-
-          def handler(event, context):
-              # make sure we send a failure to CloudFormation if the function
-              # is going to timeout
-              timer = threading.Timer((context.get_remaining_time_in_millis()
-                        / 1000.00) - 0.5, timeout, args=[event, context])
-              timer.start()
-
-              print('Received event: %s' % json.dumps(event))
-              status = cfnresponse.SUCCESS
-              try:
-                  source_bucket = event['ResourceProperties']['SourceBucket']
-                  dest_bucket = event['ResourceProperties']['DestBucket']
-                  prefix = event['ResourceProperties']['Prefix']
-                  objects = event['ResourceProperties']['Objects']
-                  if event['RequestType'] == 'Delete':
-                      delete_objects(dest_bucket, prefix, objects)
-                  else:
-                      copy_objects(source_bucket, dest_bucket, prefix, objects)
-              except Exception as e:
-                  logging.error('Exception: %s' % e, exc_info=True)
-                  status = cfnresponse.FAILED
-              finally:
-                  timer.cancel()
-                  cfnresponse.send(event, context, status, {}, None)
-  CopyZipsRole:
-    Condition: DBPasswordRotation
-    Type: AWS::IAM::Role
-    Properties:
-      AssumeRolePolicyDocument:
-        Version: '2012-10-17'
-        Statement:
-          - Effect: Allow
-            Principal:
-              Service: lambda.amazonaws.com
-            Action: sts:AssumeRole
-      ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
-      Path: /
-      Policies:
-        - PolicyName: lambda-copier
-          PolicyDocument:
-            Version: '2012-10-17'
-            Statement:
-              - Effect: Allow
-                Action:
-                  - s3:GetObject
-                Resource: !Sub
-                  - arn:${AWS::Partition}:s3:::${S3Bucket}/${QSS3KeyPrefix}*
-                  - S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
-              - Effect: Allow
-                Action:
-                  - s3:PutObject
-                  - s3:DeleteObject
-                Resource:
-                  - !Sub 'arn:aws:s3:::${LambdaZipsBucket}/${QSS3KeyPrefix}*'
-
 Outputs:
   DBName:
     Description: "Amazon Aurora database name"

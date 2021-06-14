@@ -1,71 +1,63 @@
 [
     {
-      "ParameterKey": "ProjectName",
-      "ParameterValue": "magento-sample"
-    },
-    {
-        "ParameterKey": "StageName",
-        "ParameterValue": "dev"
-    },
-    {
         "ParameterKey": "AccessCIDR",
-        "ParameterValue": "sample@magento.fr"
+        "ParameterValue": "54.239.6.185/32"
     },
     {
         "ParameterKey": "AdminEmail",
-        "ParameterValue": "magento-sample"
+        "ParameterValue": "houes@amazon.fr"
     },
     {
         "ParameterKey": "AdminFirstName",
-        "ParameterValue": "magento-sample"
+        "ParameterValue": "Steve"
     },
     {
         "ParameterKey": "AdminLastName",
-        "ParameterValue": "magento-sample"
+        "ParameterValue": "Houel"
     },
     {
         "ParameterKey": "AdminPassword",
-        "ParameterValue": "magento-sample"
+        "ParameterValue": "Aws2021!"
     },
     {
         "ParameterKey": "AdminUserName",
-        "ParameterValue": "magento-sample"
+        "ParameterValue": "houes"
     },
     {
         "ParameterKey": "AvailabilityZones",
-        "ParameterValue": "magento-sample"
+        "ParameterValue": "eu-west-1a,eu-west-1b"
     },
     {
         "ParameterKey": "DBAutoMinorVersionUpgrade",
-        "ParameterValue": "magento-sample"
+        "ParameterValue": "true"
     },
     {
         "ParameterKey": "DBBackupRetentionPeriod",
-        "ParameterValue": "magento-sample"
+        "ParameterValue": "7"
     },
     {
         "ParameterKey": "DBEngineType",
-        "ParameterValue": "magento-sample"
+        "ParameterValue": "Amazon Aurora"
     },
     {
         "ParameterKey": "DBInstanceClass",
-        "ParameterValue": "magento-sample"
+        "ParameterValue": "db.r5.large"
     },
     {
         "ParameterKey": "DBMasterUserPassword",
-        "ParameterValue": "magento-sample"
+        "ParameterValue": "Aws2021!"
     },
     {
         "ParameterKey": "DBMasterUsername",
-        "ParameterValue": "magento-sample"
+        "ParameterValue": "magentosample"
     },
     {
         "ParameterKey": "DBMultiAZ",
-        "ParameterValue": "magento-sample"
+        "ParameterValue": "true"
     },
     {
         "ParameterKey": "DBName",
-        "ParameterValue": "magento-sample"
+        "ParameterValue": "magentosample"
     },
     {
         "ParameterKey": "DNSName",
@@ -73,94 +65,86 @@
     },
     {
         "ParameterKey": "ElastiCacheAutomaticFailover",
-        "ParameterValue": "magento-sample"
+        "ParameterValue": "true"
     },
     {
         "ParameterKey": "ElastiCacheNodeType",
-        "ParameterValue": "magento-sample"
+        "ParameterValue": "cache.m5.large"
     },
     {
         "ParameterKey": "ElastiCacheNodes",
-        "ParameterValue": "magento-sample"
+        "ParameterValue": "2"
     },
     {
         "ParameterKey": "MagentoCurrency",
-        "ParameterValue": "magento-sample"
+        "ParameterValue": "EUR"
     },
     {
         "ParameterKey": "MagentoLanguage",
-        "ParameterValue": "magento-sample"
+        "ParameterValue": "fr_FR"
     },
     {
         "ParameterKey": "MagentoReleaseMedia",
-        "ParameterValue": "magento-sample"
+        "ParameterValue": "magento-ce-2.4.2-p1-2021-04-22-10-51-08.tar.gz"
     },
     {
         "ParameterKey": "MagentoVersion",
-        "ParameterValue": "magento-sample"
+        "ParameterValue": "2.4"
     },
     {
         "ParameterKey": "MagentoTimezone",
-        "ParameterValue": "magento-sample"
+        "ParameterValue": "Europe/Paris"
     },
     {
         "ParameterKey": "NotificationEmail",
-        "ParameterValue": "magento-sample"
+        "ParameterValue": "houes@amazon.fr"
     },
     {
         "ParameterKey": "PrivateSubnet1CIDR",
-        "ParameterValue": "magento-sample"
+        "ParameterValue": "10.0.0.0/19"
     },
     {
         "ParameterKey": "PrivateSubnet2CIDR",
-        "ParameterValue": "magento-sample"
+        "ParameterValue": "10.0.32.0/19"
     },
     {
         "ParameterKey": "PublicSubnet1CIDR",
-        "ParameterValue": "magento-sample"
+        "ParameterValue": "10.0.128.0/20"
     },
     {
         "ParameterKey": "PublicSubnet2CIDR",
-        "ParameterValue": "magento-sample"
+        "ParameterValue": "10.0.144.0/20"
     },
     {
         "ParameterKey": "QSS3BucketName",
-        "ParameterValue": "magento-sample"
-    },
-    {
-        "ParameterKey": "QSS3BucketRegion",
-        "ParameterValue": "magento-sample"
+        "ParameterValue": "aws-fr-houes-magento-sample-artifact"
     },
     {
         "ParameterKey": "QSS3KeyPrefix",
-        "ParameterValue": "magento-sample"
-    },
-    {
-        "ParameterKey": "RemoteAccessCIDR",
-        "ParameterValue": "magento-sample"
+        "ParameterValue": ""
     },
     {
         "ParameterKey": "SSLCertificateId",
-        "ParameterValue": "magento-sample"
+        "ParameterValue": ""
     },
     {
         "ParameterKey": "VPCCIDR",
-        "ParameterValue": "magento-sample"
+        "ParameterValue": "10.0.0.0/16"
     },
     {
         "ParameterKey": "WebServerDesiredCapacity",
-        "ParameterValue": "magento-sample"
+        "ParameterValue": "2"
     },
     {
         "ParameterKey": "WebServerInstanceType",
-        "ParameterValue": "magento-sample"
+        "ParameterValue": "t3.large"
     },
     {
         "ParameterKey": "WebServerMaxSize",
-        "ParameterValue": "magento-sample"
+        "ParameterValue": "4"
     },
     {
         "ParameterKey": "WebServerMinSize",
-        "ParameterValue": "magento-sample"
+        "ParameterValue": "2"
     }
   ]

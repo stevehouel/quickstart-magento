@@ -6,7 +6,7 @@ BASE := $(shell /bin/pwd)
 PROJECT_NAME ?= sample-magento
 STAGE_NAME ?= dev
 AWS_REGION ?= eu-west-1
-S3_ARTIFACT_BUCKET ?= aws-fr-houes-magento-sample-dev
+S3_ARTIFACT_BUCKET ?= aws-fr-houes-magento-sample-artifact
 
 CFN_PARAMS := ProjectName=$(PROJECT_NAME) \
 		StageName=$(STAGE_NAME)
@@ -15,15 +15,12 @@ TAGS_PARAMS := Key="project",Value="${PROJECT_NAME}" \
         Key="owner",Value="houes" \
         Key="environment",Value=$(STAGE_NAME)
 
-package:
-	aws cloudformation package \
-		--template-file templates/magento-master.template \
-		--s3-bucket ${S3_ARTIFACT_BUCKET} \
-		--output-template-file template-out.yml
+sync:
+	aws s3 sync ./ s3://${S3_ARTIFACT_BUCKET} --delete --exclude "*" --include "templates/*" --include "code/*" --include "scripts/*"
 
 create-stack:
 	aws cloudformation create-stack \
-		--template-body file://template-out.yml \
+		--template-body file://templates/magento-master.template.yaml \
 		--stack-name ${PROJECT_NAME}-${STAGE_NAME} \
 		--parameter file://config/config.${STAGE_NAME}.json \
 		--capabilities CAPABILITY_NAMED_IAM \
@@ -45,7 +42,7 @@ execute-change-set:
 		--change-set-name ${PROJECT_NAME}-${STAGE_NAME}-changeset
 		--stack-name ${PROJECT_NAME}-${STAGE_NAME}
 
-delete:
+delete-stack:
 	aws cloudformation delete-stack \
         --stack-name $(PROJECT_NAME)-${STAGE_NAME} \
         --region $(AWS_REGION)
