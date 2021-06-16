@@ -134,13 +134,15 @@ Parameters:
     Description: The language you’d like to use for the text that appears throughout
       the Magento store (Check here for the supported Language command http://devdocs.magento.com/guides/v2.0/install-gde/install/cli/install-cli-install.html)
     Type: String
-  MagentoReleaseMedia:
-    Default: ''
-    Description: Magento .tar.gz file
-    Type: String
   MagentoVersion:
     Default: '2.4'
     Description: Magento Version (2.1 / 2.3 / 2.4)
+    Type: String
+  MagentoUsername:
+    Description: Magento access key (public)
+    Type: String
+  MagentoPasswword:
+    Description: Magenton access key (private)
     Type: String
   MagentoTimezone:
     Default: America/Los_Angeles
@@ -208,10 +210,19 @@ Resources:
         AccessCIDR: !Ref AccessCIDR
         VPCID: !Ref VPCID
         VPCCIDR: !Ref VPCCIDR
+
   RDSStack:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: !Sub 'https://s3.amazonaws.com/${QSS3BucketName}/${QSS3KeyPrefix}templates/aurora_mysql.template.yaml'
+      TemplateURL: 
+        !Sub 
+        - https://s3.amazonaws.com/${QSS3BucketName}/${QSS3KeyPrefix}templates/${RDSScriptName}
+        - RDSScriptName:
+            !If
+            - UseAurora
+            - aurora_mysql.template.yaml
+            - rdsmysql.template
+
       Parameters:
         VPCID: !Ref VPCID
         CustomDBSecurityGroup: !GetAtt SecurityGroupStack.Outputs.MySQLRDSSecurityGroup
@@ -255,7 +266,8 @@ Resources:
         MagentoCurrency: !Ref MagentoCurrency
         MagentoLanguage: !Ref MagentoLanguage
         MagentoTimezone: !Ref MagentoTimezone
-        MagentoReleaseMedia: !Ref MagentoReleaseMedia
+        MagentoUsername: !Ref MagentoUsername
+        MagentoPassword: !Ref MagentoPassword
         MagentoVersion: !Ref MagentoVersion
         DBMasterUserPassword: !Ref DBMasterUserPassword
         DBMasterUsername: !Ref DBMasterUsername

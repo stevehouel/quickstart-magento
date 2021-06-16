@@ -23,6 +23,8 @@ magentolanguage=${13}
 magentocurrency=${14}
 magentotimezone=${15}
 magentoversion=${16}
+magentousername=${17}
+magentopassword=${18}
 
 cd
 #curl -o magento.tar.gz $magentourl
@@ -34,11 +36,15 @@ cd
 #fi
 [ -f "magento.tar.gz" ] && echo "Media file Found" || echo "Media file Not found"
 
-cd /var/www/html
-tar xzf /home/ec2-user/magento.tar.gz
+#Configure Magento credentials
+composer config --global http-basic.repo.magento.com $magentousername $magentopassword
 
-find var vendor pub/static pub/media app/etc -type f -exec chmod g+w {} \;
-find var vendor pub/static pub/media app/etc -type d -exec chmod g+ws {} \;
+cd /var/www/html
+
+php /usr/local/bin/composer create-project --repository-url=https://repo.magento.com/ magento/project-community-edition=$magentoversion .
+
+find var generated vendor pub/static pub/media app/etc -type f -exec chmod g+w {} \;
+find var generated vendor pub/static pub/media app/etc -type d -exec chmod g+ws {} \;
 chown -R :nginx .
 chmod u+x bin/magento
 
@@ -176,10 +182,7 @@ then
 
 fi
 
-if [ "$magentoversion" = "2.1" ]
-then
-   ./magento deploy:mode:set production
-else
+
 cd /var/www/html/bin
 ./magento setup:install --base-url=$protocol://$cname/ \
 --db-host=$dbhost --db-name=$dbname --db-user=$dbuser --db-password=$dbpassword \

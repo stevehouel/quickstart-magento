@@ -1,6 +1,6 @@
 ---
 AWSTemplateFormatVersion: '2010-09-09'
-Description: Magento 2.1 RDS MySQL Template (qs-1qup6rabn)
+Description: RDS MySQL Template
 Parameters:
   DBAllocatedStorage:
     ConstraintDescription: must be between 5 and 4096 GiB. If Iops specified, AllocatedStorage
@@ -115,7 +115,7 @@ Resources:
       AllocatedStorage: !Ref DBAllocatedStorage
       DBInstanceClass: !Ref DBInstanceClass
       Engine: MySQL
-      EngineVersion: '5.6'
+      EngineVersion: '8.0'
       MasterUsername: !Ref DBMasterUsername
       MasterUserPassword: !Ref DBMasterUserPassword
       DBSubnetGroupName: !Ref MySQLDBSubnetGroup

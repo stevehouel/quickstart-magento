@@ -71,13 +71,15 @@ Parameters:
     Default: Europe/Lisbon
     Description: Magento Timezone
     Type: String
-  MagentoReleaseMedia:
-    Default: ''
-    Description: Magento .tar.gz file
-    Type: String
   MagentoVersion:
     Default: '2.4'
-    Description: Magento Version (2.1 / 2.3 / 2.4)
+    Description: Magento Version
+    Type: String
+  MagentoUsername:
+    Description: Magento access key (public)
+    Type: String
+  MagentoPassword:
+    Description: Magenton access key (private)
     Type: String
   MySQLEndPointAddress:
     Default: ''
@@ -300,12 +302,13 @@ Resources:
                   AdminPassword|${AdminPassword}
                   ElastiCacheEndpoint|${ElastiCacheEndpoint}
                   FileSystem|${FileSystem}
-                  MagentoReleaseMedia|${MagentoReleaseMedia}
                   MagentoVersion|${MagentoVersion}
                   SSLCertificateId|${SSLCertificateId}
                   MagentoLanguage|${MagentoLanguage}
                   MagentoCurrency|${MagentoCurrency}
                   MagentoTimezone|${MagentoTimezone}
+                  MagentoUsername|${MagentoUsername}
+                  MagentoPassword|${MagentoPassword}
                 - Param1:
                     !If
                     - UseELBName
@@ -347,7 +350,6 @@ Resources:
             /opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource MagentoAMI  --region ${AWS::Region}
             aws s3 cp s3://${QSS3BucketName}/${QSS3KeyPrefix}scripts/install_magento.sh ./
             aws s3 cp s3://${QSS3BucketName}/${QSS3KeyPrefix}scripts/configure_magento.sh ./
-            aws s3 cp s3://${QSS3BucketName}/${MagentoReleaseMedia} /home/ec2-user/magento.tar.gz
             chmod a+x install_magento.sh
             ./install_magento.sh /tmp/params.txt
             /opt/aws/bin/cfn-signal -e $? -d "`cat /home/ec2-user/adminuri`" -r "Build Process Complete" '${MagentoAMIWaitHandle}'

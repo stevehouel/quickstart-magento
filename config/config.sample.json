@@ -89,7 +89,15 @@
     },
     {
         "ParameterKey": "MagentoVersion",
-        "ParameterValue": "2.4"
+        "ParameterValue": "2.4.2"
+    },
+    {
+        "ParameterKey": "MagentoUsername",
+        "ParameterValue": "d72129db5d397787cc64b106ce701a75"
+    },
+    {
+        "ParameterKey": "MagentoPassword",
+        "ParameterValue": "3afd0a6a5069a77490eb986b1fad6d88"
     },
     {
         "ParameterKey": "MagentoTimezone",

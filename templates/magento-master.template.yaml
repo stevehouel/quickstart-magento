@@ -144,13 +144,15 @@ Parameters:
     Description: The language you’d like to use for the text that appears throughout
       the Magento store (Check here for the supported Language command http://devdocs.magento.com/guides/v2.0/install-gde/install/cli/install-cli-install.html)
     Type: String
-  MagentoReleaseMedia:
-    Default: ''
-    Description: Magento .tar.gz file (magento-ce-2.4.2-p1-2021-04-22-10-51-08.tar.gz)
-    Type: String
   MagentoVersion:
     Default: '2.4'
-    Description: Magento Version (2.1 / 2.3 / 2.4)
+    Description: Magento Version
+    Type: String
+  MagentoUsername:
+    Description: Magento access key (public)
+    Type: String
+  MagentoPassword:
+    Description: Magenton access key (private)
     Type: String
   MagentoTimezone:
     Default: Europe/Paris
@@ -259,7 +261,8 @@ Resources:
         MagentoCurrency: !Ref MagentoCurrency
         MagentoLanguage: !Ref MagentoLanguage
         MagentoTimezone: !Ref MagentoTimezone
-        MagentoReleaseMedia: !Ref MagentoReleaseMedia
+        MagentoUsername: !Ref MagentoUsername
+        MagentoPassword: !Ref MagentoPassword
         MagentoVersion: !Ref MagentoVersion
         NotificationEmail: !Ref NotificationEmail
         PrivateSubnet1ID: !GetAtt VPCStack.Outputs.PrivateSubnet1AID
