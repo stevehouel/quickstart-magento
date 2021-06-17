@@ -68,7 +68,7 @@ Parameters:
     Description: Magento Language
     Type: String
   MagentoTimezone:
-    Default: Europe/Lisbon
+    Default: Europe/Paris
     Description: Magento Timezone
     Type: String
   MagentoVersion:

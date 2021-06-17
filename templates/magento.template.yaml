@@ -141,7 +141,7 @@ Parameters:
   MagentoUsername:
     Description: Magento access key (public)
     Type: String
-  MagentoPasswword:
+  MagentoPassword:
     Description: Magenton access key (private)
     Type: String
   MagentoTimezone:
@@ -221,7 +221,7 @@ Resources:
             !If
             - UseAurora
             - aurora_mysql.template.yaml
-            - rdsmysql.template
+            - rdsmysql.template.yaml
 
       Parameters:
         VPCID: !Ref VPCID
