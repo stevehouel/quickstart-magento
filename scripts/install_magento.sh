@@ -133,7 +133,7 @@ http {
     }
     server {
         listen 80;
-        server_name magento-sample;
+        server_name $cname;
         set $MAGE_ROOT /var/www/html;
         set $MAGE_DEBUG_SHOW_ARGS 0;
 
