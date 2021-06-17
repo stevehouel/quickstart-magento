@@ -1,11 +1,11 @@
 [
     {
         "ParameterKey": "AccessCIDR",
-        "ParameterValue": "54.239.6.185/32"
+        "ParameterValue": ""
     },
     {
         "ParameterKey": "AdminEmail",
-        "ParameterValue": "houes@amazon.fr"
+        "ParameterValue": ""
     },
     {
         "ParameterKey": "AdminFirstName",
@@ -17,7 +17,7 @@
     },
     {
         "ParameterKey": "AdminPassword",
-        "ParameterValue": "Aws2021!"
+        "ParameterValue": ""
     },
     {
         "ParameterKey": "AdminUserName",
@@ -45,7 +45,7 @@
     },
     {
         "ParameterKey": "DBMasterUserPassword",
-        "ParameterValue": "Aws2021!"
+        "ParameterValue": ""
     },
     {
         "ParameterKey": "DBMasterUsername",
@@ -121,7 +121,7 @@
     },
     {
         "ParameterKey": "QSS3BucketName",
-        "ParameterValue": "aws-fr-houes-magento-sample-artifact"
+        "ParameterValue": ""
     },
     {
         "ParameterKey": "QSS3KeyPrefix",
