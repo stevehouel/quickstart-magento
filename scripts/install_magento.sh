@@ -133,7 +133,7 @@ http {
     }
     server {
         listen 80;
-        server_name $cname;
+        server_name _;
         set $MAGE_ROOT /var/www/html;
         set $MAGE_DEBUG_SHOW_ARGS 0;
 
