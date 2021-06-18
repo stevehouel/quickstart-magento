@@ -485,7 +485,7 @@ chown ec2-user:nginx /var/www/html
 chmod g+w /var/www/html/
 usermod -g nginx ec2-user
 chgrp -R nginx /var/lib/php/*
-service nginx start
+service nginx restart
 
 chmod a+x configure_magento.sh
 mv configure_magento.sh /tmp
@@ -513,4 +513,5 @@ cat << EOF > magento.cron
 * * * * * /usr/bin/php -c /etc/php.ini /var/www/html/bin/magento setup:cron:run >> /var/www/html/var/log/setup.cron.log
 EOF
 
+service nginx restart
 crontab -u ec2-user magento.cron
