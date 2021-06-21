@@ -522,28 +522,12 @@ Resources:
     Properties:
       HealthCheckIntervalSeconds: 30
       HealthCheckPath: /health
-      HealthCheckPort:
-        !If
-        - UseSSL
-        - '443'
-        - '80'
-      HealthCheckProtocol:
-        !If
-        - UseSSL
-        - HTTPS
-        - HTTP
+      HealthCheckPort: 80
+      HealthCheckProtocol: HTTP
       HealthCheckTimeoutSeconds: 5
       HealthyThresholdCount: 2
-      Port:
-        !If
-        - UseSSL
-        - 443
-        - 80
-      Protocol:
-        !If
-        - UseSSL
-        - HTTPS
-        - HTTP
+      Port: 80
+      Protocol: HTTP
       UnhealthyThresholdCount: 5
       VpcId:
         Ref: VPCID

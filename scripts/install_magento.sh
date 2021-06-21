@@ -75,6 +75,7 @@ amazon-linux-extras install -y php7.4
 yum -y update
 yum install -y libsodium php php-cli php-pear php-devel php-common php-mysqlnd php-pdo php-opcache php-xml php-mcrypt php-gd php-soap php-redis php-bcmath php-intl php-sodium php-mbstring php-json php-iconv php-fpm php-zip mysql
 
+chkconfig nginx on
 service nginx restart
 service php-fpm restart
 
@@ -513,5 +514,6 @@ cat << EOF > magento.cron
 * * * * * /usr/bin/php -c /etc/php.ini /var/www/html/bin/magento setup:cron:run >> /var/www/html/var/log/setup.cron.log
 EOF
 
-service nginx restart
+service nginx start
+chkconfig nginx on
 crontab -u ec2-user magento.cron
