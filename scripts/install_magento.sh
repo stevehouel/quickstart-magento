@@ -76,6 +76,7 @@ yum -y update
 yum install -y libsodium php php-cli php-pear php-devel php-common php-mysqlnd php-pdo php-opcache php-xml php-mcrypt php-gd php-soap php-redis php-bcmath php-intl php-sodium php-mbstring php-json php-iconv php-fpm php-zip mysql
 
 chkconfig nginx on
+chkconfig php-fpm on
 service nginx restart
 service php-fpm restart
 
@@ -515,5 +516,4 @@ cat << EOF > magento.cron
 EOF
 
 service nginx start
-chkconfig nginx on
 crontab -u ec2-user magento.cron
