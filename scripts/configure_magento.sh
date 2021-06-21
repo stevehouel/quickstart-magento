@@ -59,7 +59,8 @@ cd /var/www/html/bin
 ./magento setup:install --base-url=$protocol://$cname/ \
 --db-host=$dbhost --db-name=$dbname --db-user=$dbuser --db-password=$dbpassword \
 --admin-firstname=$adminfirst --admin-lastname=$adminlast --admin-email=$adminemail \
---admin-user=$adminuser --admin-password=$adminpassword $secure
+--admin-user=$adminuser --admin-password=$adminpassword --language=$magentolanguage \
+--currency=$magentocurrency --timezone=$magentotimezone $secure
 
 ./magento module:disable {Magento_Elasticsearch,Magento_InventoryElasticsearch,Magento_Elasticsearch6,Magento_Elasticsearch7}
 
@@ -75,6 +76,7 @@ fi
 magento setup:install --base-url=$protocol://$cname/ \
 --db-host=$dbhost --db-name=$dbname --db-user=$dbuser --db-password=$dbpassword \
 --admin-firstname=$adminfirst --admin-lastname=$adminlast --admin-email=$adminemail \
---admin-user=$adminuser --admin-password=$adminpassword $secure
+--admin-user=$adminuser --admin-password=$adminpassword --language=$magentolanguage \
+--currency=$magentocurrency --timezone=$magentotimezone $secure
 
 ./magento info:adminuri > /home/ec2-user/adminuri
