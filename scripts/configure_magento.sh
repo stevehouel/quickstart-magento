@@ -75,8 +75,12 @@ fi
 
 magento setup:install --base-url=$protocol://$cname/ \
 --db-host=$dbhost --db-name=$dbname --db-user=$dbuser --db-password=$dbpassword \
+--cache-backend=redis --cache-backend-redis-server=$cachehost --cache-backend-redis-port=6379 --cache-backend-redis-db=0 \
+--page-cache=redis --page-cache-redis-server=$cachehost --page-cache-redis-port=6379 --page-cache-redis-db=1 \
+--session-save=redis --session-save-redis-host=$cachehost \
 --admin-firstname=$adminfirst --admin-lastname=$adminlast --admin-email=$adminemail \
 --admin-user=$adminuser --admin-password=$adminpassword --language=$magentolanguage \
 --currency=$magentocurrency --timezone=$magentotimezone $secure
+
 
 ./magento info:adminuri > /home/ec2-user/adminuri
