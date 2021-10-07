@@ -242,6 +242,10 @@ Parameters:
     Default: 300
     MaxValue: 86400
     MinValue: 300
+  DBSnapshotIdentifier:
+    Default: ''
+    Description: DN Snapshot ARN
+    Type: String
 
 Mappings:
   DBFamilyMap:
@@ -449,6 +453,11 @@ Rules:
         AssertDescription: "Please provide 2 distinct private subnets"
 
 Conditions:
+  UseDBSnapshot:
+    !Not
+    - !Equals
+      - !Ref DBSnapshotIdentifier
+      - ''
   DBPasswordRotation:
     !Equals
     - !Ref RotateDBPassword

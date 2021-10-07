@@ -196,6 +196,14 @@ Parameters:
     Default: '1'
     Description: Minimum No of web server instances
     Type: Number
+  DBSnapshotIdentifier:
+    Default: ''
+    Description: DN Snapshot ARN
+    Type: String
+  CustomMagentoAMI:
+    Type: String
+    Default: ''
+    Description: Customer MAgento AMI to use when deploying
 Conditions:
   UseAurora:
     !Equals
@@ -235,6 +243,8 @@ Resources:
         DBMasterUsername: !Ref DBMasterUsername
         DBMasterUserPassword: !Ref DBMasterUserPassword
         DBMultiAZ: !Ref DBMultiAZ
+        DBSnapshotIdentifier: !Ref DBSnapshotIdentifier
+        
   ElastiCache:
     Type: AWS::CloudFormation::Stack
     Properties:
@@ -287,6 +297,7 @@ Resources:
         SSLCertificateId: !Ref SSLCertificateId
         QSS3BucketName: !Ref QSS3BucketName
         QSS3KeyPrefix: !Ref QSS3KeyPrefix
+        CustomMagentoAMI: !Ref CustomMagentoAMI
 Outputs:
   URL:
     Description: The URL of the website

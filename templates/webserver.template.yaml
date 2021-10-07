@@ -141,7 +141,15 @@ Parameters:
     Description: A list of subnet identifiers of Amazon VPCs where the WebServer Autoscaling
       would be launched.
     Type: List<AWS::EC2::Subnet::Id>
+  CustomMagentoAMI:
+    Type: String
+    Default: ''
+    Description: Customer MAgento AMI to use when deploying
 Conditions:
+  UseDefaultAMI:
+    - !Equals
+      - !Ref CustomMagentoAMI
+      - ''
   UseSSL:
     !Not
     - !Equals
@@ -484,7 +492,7 @@ Resources:
   WebServerLC:
     Type: AWS::AutoScaling::LaunchConfiguration
     Properties:
-      ImageId: !GetAtt CreateAMI.ami
+      ImageId: !If [UseDefaultAMI, !GetAtt CreateAMI.ami, !Ref CustomMagentoAMI]
       InstanceType: !Ref WebServerInstanceType
       SecurityGroups:
       - !Ref WebServerSecurityGroup

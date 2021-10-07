@@ -67,6 +67,13 @@ Parameters:
     Description: Specifies if the database instance is a multiple Availability Zone
       deployment.
     Type: String
+  EnablePI:
+    AllowedValues:
+    - 'true'
+    - 'false'
+    Default: 'true'
+    Description: Enable Performance Insights
+    Type: String
   DBName:
     AllowedPattern: '[a-zA-Z][a-zA-Z0-9]*'
     Default: QuickstartMySQLDB
@@ -92,15 +99,149 @@ Parameters:
     Description: The ID of the private subnet in Availability Zone 2.
     Type: 'AWS::EC2::Subnet::Id'
   VPCID:
+  DBAllocatedStorageEncrypted:
+    Default: "true"
+    AllowedValues:
+      - "true"
+      - "false"
+    Description: Whether or not to encrypt the database.
+    Type: String
     Description: "ID of the VPC you are deploying into (e.g., vpc-0343606e)."
     Type: 'AWS::EC2::VPC::Id'
     Default: ''
+
+  RotateDBPassword:
+    Default: "false"
+    AllowedValues:
+      - "true"
+      - "false"
+    Description: Whether or not to rotate the database password on a schedule (every 89 days).
+    Type: String
+  DBSnapshotIdentifier:
+    Default: ''
+    Description: DN Snapshot ARN
+    Type: String
+  EnvironmentStage:
+    Type: String
+    Description: Designates the environment stage of the associated AWS resource. (Optional)
+    AllowedValues:
+      - dev
+      - test
+      - pre-prod
+      - prod
+      - none
+    Default: none
+  Application:
+    Type: String
+    Default: ''
+    Description: Designates the application of the associated AWS resource. (Optional)
+  ApplicationVersion:
+    Type: String
+    Description: Dsignates the specific version of the application. (Optional)
+    Default: ''
+  ProjectCostCenter:
+    Type: String
+    Default: ''
+    Description: Designates the cost center associated with the project of the given AWS resource. (Optional)
+  Confidentiality:
+    Type: String
+    Default: ''
+    Description: Designates the confidentiality classification of the data that is associated with the resource. (Optional)
+    AllowedValues:
+      - public
+      - private
+      - confidential
+      - pii/phi
+      - ''
+  Compliance:
+    Type: String
+    Default: ''
+    Description: Designates the compliance level for the AWS resource. (Optional)
+    AllowedValues:
+      - hipaa
+      - sox
+      - fips
+      - other
+      - ''
 Conditions:
+  DBPasswordRotation:
+    !Equals
+    - !Ref RotateDBPassword
+    - 'true'
+  
+  UseDBSnapshot:
+    !Not
+    - !Equals
+      - !Ref DBSnapshotIdentifier
+      - ''
+
   IOPSStorageType:
     !Equals
     - !Ref DBStorageType
     - io1
+  UseDatabaseEncryption:
+    !Equals
+    - !Ref DBAllocatedStorageEncrypted
+    - true
 Resources:
+  MonitoringIAMRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          -
+            Effect: "Allow"
+            Principal:
+              Service:
+                - "monitoring.rds.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      Path: "/"
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonRDSEnhancedMonitoringRole
+
+  EncryptionKey:
+    DeletionPolicy: Retain
+    Type: AWS::KMS::Key
+    Properties:
+      KeyPolicy:
+        Version: 2012-10-17
+        Id: !Ref AWS::StackName
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS:
+                - !Sub "arn:aws:iam::${AWS::AccountId}:root"
+            Action: 'kms:*'
+            Resource: '*'
+          - Effect: Allow
+            Principal:
+              AWS: '*'
+            Action:
+              - 'kms:Encrypt'
+              - 'kms:Decrypt'
+              - 'kms:ReEncrypt*'
+              - 'kms:GenerateDataKey*'
+              - 'kms:CreateGrant'
+              - 'kms:ListGrants'
+              - 'kms:DescribeKey'
+            Resource: '*'
+            Condition:
+              StringEquals:
+                'kms:CallerAccount': !Ref 'AWS::AccountId'
+                'kms:ViaService': !Sub 'rds.${AWS::Region}.amazonaws.com'
+      Tags:
+        - Key: Name
+          Value: !Ref AWS::StackName
+  EncryptionKeyAlias:
+    Type: AWS::KMS::Alias
+    Properties:
+      AliasName: !Sub "alias/${AWS::StackName}"
+      TargetKeyId: !Ref EncryptionKey
+
+  
+
   MySQLDBSubnetGroup:
     Type: AWS::RDS::DBSubnetGroup
     Properties:
@@ -113,11 +254,17 @@ Resources:
     Properties:
       DBName: !Ref DBName
       AllocatedStorage: !Ref DBAllocatedStorage
+      DBSnapshotIdentifier: !If [UseDBSnapshot, !Ref DBSnapshotIdentifier, !Ref 'AWS::NoValue']
       DBInstanceClass: !Ref DBInstanceClass
       Engine: MySQL
       EngineVersion: '8.0'
+      KmsKeyId: !If [UseDatabaseEncryption, !GetAtt EncryptionKey.Arn, !Ref 'AWS::NoValue']
       MasterUsername: !Ref DBMasterUsername
-      MasterUserPassword: !Ref DBMasterUserPassword
+      MasterUserPassword:
+        !If
+        - DBPasswordRotation
+        - !Join ['', ['{{resolve:secretsmanager:', !Ref RDSInstanceRotationSecret, '::password}}' ]]
+        - !Ref DBMasterUserPassword
       DBSubnetGroupName: !Ref MySQLDBSubnetGroup
       VPCSecurityGroups:
       - !Ref CustomDBSecurityGroup
@@ -125,25 +272,314 @@ Resources:
       StorageType: !Ref DBStorageType
       AutoMinorVersionUpgrade: !Ref DBAutoMinorVersionUpgrade
       BackupRetentionPeriod: !Ref DBBackupRetentionPeriod
+      MonitoringInterval: 1
+      MonitoringRoleArn: !GetAtt MonitoringIAMRole.Arn
+      EnablePerformanceInsights: !If [EnablePI, true, !Ref 'AWS::NoValue']
+      PerformanceInsightsKMSKeyId: !If [EnablePI, !Ref EncryptionKey, !Ref 'AWS::NoValue']
+      PerformanceInsightsRetentionPeriod: !If [EnablePI, 7, !Ref 'AWS::NoValue']
+      CopyTagsToSnapshot: true
       Iops:
         !If
         - IOPSStorageType
         - !Ref DBIops
         - !Ref AWS::NoValue
       Tags:
-      - Key: Name
-        Value: !Sub MySQLDB-${AWS::StackName}
+        -
+          Key: Name
+          Value: !Sub RDSDB-${AWS::StackName}
+        -
+          Key: EnvironmentStage
+          Value: !Ref EnvironmentStage
+        -
+          Key: Application
+          Value: !Ref Application
+        -
+          Key: ApplicationVersion
+          Value: !Ref ApplicationVersion
+        -
+          Key: ProjectCostCenter
+          Value: !Ref ProjectCostCenter
+        -
+          Key: Confidentiality
+          Value: !Ref Confidentiality
+        -
+          Key: Compliance
+          Value: !Ref Compliance
+  CPUUtilizationAlarm1:
+    Type: "AWS::CloudWatch::Alarm"
+    Condition: IsServerlessDisabled
+    Properties:
+      ActionsEnabled: true
+      AlarmActions:
+        - Ref: DBSNSTopic
+      AlarmDescription: 'CPU_Utilization'
+      Dimensions:
+        - Name: DBInstanceIdentifier
+          Value:
+            Ref: RDSDB1
+      MetricName: CPUUtilization
+      Statistic: Maximum
+      Namespace: 'AWS/RDS'
+      Threshold: 80
+      Unit: Percent
+      ComparisonOperator: 'GreaterThanOrEqualToThreshold'
+      Period: 60
+      EvaluationPeriods: 5
+      TreatMissingData: 'notBreaching'
+  CPUUtilizationAlarm2:
+    Condition: IsDBMultiAZ
+    Type: "AWS::CloudWatch::Alarm"
+    Properties:
+      ActionsEnabled: true
+      AlarmActions:
+        - Ref: DBSNSTopic
+      AlarmDescription: 'CPU_Utilization'
+      Dimensions:
+        - Name: DBInstanceIdentifier
+          Value:
+            Ref: RDSDB2
+      MetricName: CPUUtilization
+      Statistic: Maximum
+      Namespace: 'AWS/RDS'
+      Threshold: 80
+      Unit: Percent
+      ComparisonOperator: 'GreaterThanOrEqualToThreshold'
+      Period: 60
+      EvaluationPeriods: 5
+      TreatMissingData: 'notBreaching'
+  FreeLocalStorageAlarm1:
+    Type: "AWS::CloudWatch::Alarm"
+    Condition: IsServerlessDisabled
+    Properties:
+      ActionsEnabled: true
+      AlarmActions:
+        - Ref: DBSNSTopic
+      AlarmDescription: 'Free Local Storage'
+      Dimensions:
+        - Name: DBInstanceIdentifier
+          Value:
+            Ref: RDSDB1
+      MetricName: 'FreeLocalStorage'
+      Statistic: Average
+      Namespace: 'AWS/RDS'
+      Threshold: 5368709120
+      Unit: Bytes
+      ComparisonOperator: 'LessThanOrEqualToThreshold'
+      Period: 60
+      EvaluationPeriods: 5
+      TreatMissingData: 'notBreaching'
+  FreeLocalStorageAlarm2:
+    Condition: IsDBMultiAZ
+    Type: "AWS::CloudWatch::Alarm"
+    Properties:
+      ActionsEnabled: true
+      AlarmActions:
+        - Ref: DBSNSTopic
+      AlarmDescription: 'Free Local Storage'
+      Dimensions:
+        - Name: DBInstanceIdentifier
+          Value:
+            Ref: RDSDB2
+      MetricName: 'FreeLocalStorage'
+      Statistic: Average
+      Namespace: 'AWS/RDS'
+      Threshold: 5368709120
+      Unit: Bytes
+      ComparisonOperator: 'LessThanOrEqualToThreshold'
+      Period: 60
+      EvaluationPeriods: 5
+      TreatMissingData: 'notBreaching'
+  FreeableMemoryAlarm1:
+    Type: "AWS::CloudWatch::Alarm"
+    Condition: IsServerlessDisabled
+    Properties:
+      ActionsEnabled: true
+      AlarmActions:
+        - Ref: DBSNSTopic
+      AlarmDescription: 'Freeable Memory'
+      Dimensions:
+        - Name: DBInstanceIdentifier
+          Value:
+            Ref: RDSDB1
+      MetricName: 'FreeableMemory'
+      Statistic: Average
+      Namespace: 'AWS/RDS'
+      Threshold: 2147483648
+      Unit: Bytes
+      ComparisonOperator: 'LessThanOrEqualToThreshold'
+      Period: 60
+      EvaluationPeriods: 5
+      TreatMissingData: 'notBreaching'
+  FreeableMemoryAlarm2:
+    Type: "AWS::CloudWatch::Alarm"
+    Condition: IsDBMultiAZ
+    Properties:
+      ActionsEnabled: true
+      AlarmActions:
+        - Ref: DBSNSTopic
+      AlarmDescription: 'Freeable Memory'
+      Dimensions:
+        - Name: DBInstanceIdentifier
+          Value:
+            Ref: RDSDB2
+      MetricName: 'FreeableMemory'
+      Statistic: Average
+      Namespace: 'AWS/RDS'
+      Threshold: 2147483648
+      Unit: Bytes
+      ComparisonOperator: 'LessThanOrEqualToThreshold'
+      Period: 60
+      EvaluationPeriods: 5
+      TreatMissingData: 'notBreaching'
+  DatabaseClusterEventSubscription:
+    Type: 'AWS::RDS::EventSubscription'
+    Properties:
+      EventCategories:
+        - failover
+        - failure
+        - notification
+      SnsTopicArn: !Ref DBSNSTopic
+      SourceIds: [!Ref RDSDBCluster]
+      SourceType: 'db-cluster'
+  DatabaseInstanceEventSubscription:
+    Type: 'AWS::RDS::EventSubscription'
+    Condition: IsServerlessDisabled
+    Properties:
+      EventCategories:
+        - availability
+        - configuration change
+        - deletion
+        - failover
+        - failure
+        - maintenance
+        - notification
+        - recovery
+      SnsTopicArn: !Ref DBSNSTopic
+      SourceIds:
+        - !Ref RDSDB1
+        - !If [IsDBMultiAZ, !Ref RDSDB2, !Ref "AWS::NoValue"]
+      SourceType: 'db-instance'
+  RDSInstanceRotationSecret:
+    Condition: DBPasswordRotation
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Description: !Join ['', ['RDS MySQL Master User Secret ', 'for CloudFormation Stack ', !Ref 'AWS::StackName']]
+      GenerateSecretString:
+        SecretStringTemplate: !Sub '{"username": "${DBMasterUsername}"}'
+        GenerateStringKey: "password"
+        PasswordLength: 16
+        ExcludeCharacters: "\"'@/\\"
+  SecretRDSInstanceAttachment:
+    Condition: DBPasswordRotation
+    Type: AWS::SecretsManager::SecretTargetAttachment
+    Properties:
+      SecretId: !Ref RDSInstanceRotationSecret
+      TargetId: !Ref RDSDBCluster
+      TargetType: AWS::RDS::DBCluster
+  RDSSecretRotationSchedule:
+    Condition: DBPasswordRotation
+    Type: AWS::SecretsManager::RotationSchedule
+    DependsOn:
+      - SecretRDSInstanceAttachment
+    Properties:
+      SecretId: !Ref RDSInstanceRotationSecret
+      RotationLambdaARN: !GetAtt RDSRotationLambda.Arn
+      RotationRules:
+        AutomaticallyAfterDays: 89
+  RDSRotationLambda:
+    Condition: DBPasswordRotation
+    Type: AWS::Lambda::Function
+    Properties:
+      Runtime: python3.7
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Handler: lambda_function.lambda_handler
+      Description: 'This is a lambda to rotate MySql user passwd'
+      Environment:
+        Variables:
+          SECRETS_MANAGER_ENDPOINT: !Sub 'https://secretsmanager.${AWS::Region}.amazonaws.com'
+      VpcConfig:
+        SecurityGroupIds:
+          !If
+          - CreateSecurityGroup
+          - [!Ref RDSSecurityGroup]
+          - [!Ref CustomDBSecurityGroup]
+        SubnetIds:
+          - !Ref Subnet1ID
+          - !Ref Subnet2ID
+      Code:
+        S3Bucket: !Ref QSS3BucketName
+        S3Key: !Sub '${QSS3KeyPrefix}code/SSMRotateLambda/lambda.zip'
+      Timeout: 300
+  LambdaExecutionRole:
+    Condition: DBPasswordRotation
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+                - secretsmanager.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole
+        - arn:aws:iam::aws:policy/SecretsManagerReadWrite
+      Path: /
+      Policies:
+        - PolicyName: lambda_policy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: "Allow"
+                Action:
+                  - "secretsmanager:DescribeSecret"
+                  - "secretsmanager:GetSecretValue"
+                  - "secretsmanager:PutSecretValue"
+                  - "secretsmanager:UpdateSecretVersionStage"
+                Resource: !Sub 'arn:${AWS::Partition}:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:*'
+                Condition:
+                  StringEquals:
+                    secretsmanager:resource/AllowRotationLambdaArn: !Sub 'arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:function:SecretsManager-SecretRotation-${AWS::StackName}'
+              - Effect: "Allow"
+                Action:
+                  - "secretsmanager:GetRandomPassword"
+                Resource: "*"
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: arn:aws:logs:*:*:*
+              - Effect: Allow
+                Action:
+                  - cloudformation:DescribeStacks
+                Resource: '*'
+  LambdaInvokePermission:
+    Type: AWS::Lambda::Permission
+    Condition: DBPasswordRotation
+    DependsOn: RDSRotationLambda
+    Properties:
+      FunctionName: !GetAtt RDSRotationLambda.Arn
+      Action: 'lambda:InvokeFunction'
+      Principal: secretsmanager.amazonaws.com
 Outputs:
   RDSEndPoints:
-    Description: Amazon Aurora Endpoint to connect
+    Description: Amazon RDS Endpoint to connect
     Value: !Sub ${MySQLDB.Endpoint.Address}:${MySQLDB.Endpoint.Port}/${DBName}
   DBName:
     Description: MySQL DBName
     Value: !Ref DBName
   RDSEndPointAddress:
-    Description: Amazon Aurora Endpoint to connect
+    Description: Amazon RDS Endpoint to connect
     Value: !Sub ${MySQLDB.Endpoint.Address}
   RDSEndPointPort:
-    Description: Amazon Aurora Endpoint to connect
+    Description: Amazon RDS Endpoint to connect
     Value: !Sub ${MySQLDB.Endpoint.Port}
+  RDSMasterUserSecret:
+    Condition: DBPasswordRotation
+    Description: "RDS Master User Secret ARN stored in AWS Secrets Manager"
+    Value: !Ref RDSInstanceRotationSecret
 ...
