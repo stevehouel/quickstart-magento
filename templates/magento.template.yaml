@@ -204,6 +204,12 @@ Parameters:
     Type: String
     Default: ''
     Description: Customer MAgento AMI to use when deploying
+  NotificationList:
+    Type: String
+    Default: 'db-ops@domain.com'
+    Description: The email notification used to configure an SNS topic for sending CloudWatch alarm and RDS event notifications.
+    AllowedPattern: '^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$'
+    ConstraintDescription: Provide a valid email address.
 Conditions:
   UseAurora:
     !Equals
@@ -233,6 +239,8 @@ Resources:
 
       Parameters:
         VPCID: !Ref VPCID
+        QSS3BucketName: !Ref QSS3BucketName
+        QSS3KeyPrefix: !Ref QSS3KeyPrefix
         CustomDBSecurityGroup: !GetAtt SecurityGroupStack.Outputs.MySQLRDSSecurityGroup
         Subnet1ID: !Ref PrivateSubnet1ID
         Subnet2ID: !Ref PrivateSubnet2ID
@@ -244,6 +252,7 @@ Resources:
         DBMasterUserPassword: !Ref DBMasterUserPassword
         DBMultiAZ: !Ref DBMultiAZ
         DBSnapshotIdentifier: !Ref DBSnapshotIdentifier
+        NotificationList: !Ref NotificationList
         
   ElastiCache:
     Type: AWS::CloudFormation::Stack

@@ -147,9 +147,9 @@ Parameters:
     Description: Customer MAgento AMI to use when deploying
 Conditions:
   UseDefaultAMI:
-    - !Equals
-      - !Ref CustomMagentoAMI
-      - ''
+    !Equals
+    - !Ref CustomMagentoAMI
+    - ''
   UseSSL:
     !Not
     - !Equals

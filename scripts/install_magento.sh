@@ -73,21 +73,18 @@ amazon-linux-extras install -y nginx1
 amazon-linux-extras install -y php7.4
 
 yum -y update
-yum install -y libsodium php php-cli php-pear php-devel php-common php-mysqlnd php-pdo php-opcache php-xml php-mcrypt php-gd php-soap php-redis php-bcmath php-intl php-sodium php-mbstring php-json php-iconv php-fpm php-zip mysql
+yum install -y wget unzip libsodium php php-cli php-pear php-devel php-common php-mysqlnd php-pdo php-opcache php-xml php-mcrypt php-gd php-soap php-redis php-bcmath php-intl php-sodium php-mbstring php-json php-iconv php-fpm php-zip mysql
 
 chkconfig nginx on
 chkconfig php-fpm on
 service nginx restart
 service php-fpm restart
 
-yum install wget unzip
-
 export HOME=/root
 export COMPOSER_HOME="/root/.config/composer";
 export PATH=$PATH:/usr/local/bin
 
 php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
-php -r "if (hash_file('sha384', 'composer-setup.php') === '756890a4488ce9024fc62c56153228907f1545c228516cbf63f885e036d37e9a59d27d63f46af1d4d07ee0f76181c7d3') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
 php composer-setup.php
 mv composer.phar /usr/local/bin/composer
 

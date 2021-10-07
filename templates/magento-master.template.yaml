@@ -104,7 +104,7 @@ Parameters:
     Description: Select true/false to setup Automatic Failover
     Type: String
   ElastiCacheNodeType:
-    Default: cache.m5.large
+    Default: cache.t3.medium
     Description: The name of the compute and memory capacity class of the ElastiCache
       instance.
     Type: String

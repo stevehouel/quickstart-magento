@@ -24,6 +24,7 @@ create-stack:
 		--stack-name ${PROJECT_NAME}-${STAGE_NAME} \
 		--parameter file://config/config.${STAGE_NAME}.json \
 		--capabilities CAPABILITY_NAMED_IAM \
+		--disable-rollback \
 		--region $(AWS_REGION) \
 		--tags $(TAGS_PARAMS)
 
